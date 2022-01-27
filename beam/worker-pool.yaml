@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker-pool
+spec:
+  clusterIP: None
+  ports:
+  - name: worker-pool
+    port: 50000
+    targetPort: 50000
+  selector:
+    app: worker-pool
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: worker-pool
+spec:
+  selector:
+    matchLabels:
+      app: worker-pool
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: worker-pool
+    spec:
+      hostname: worker-pool 
+      containers:
+      - image: apache/beam_python3.8_sdk:2.33.0
+        name: worker-pool
+        args:
+          - "--worker_pool"
+        ports:
+         - containerPort: 50000
+           name: worker-pool
+
+# https://github.com/GoogleCloudPlatform/flink-on-k8s-operator/tree/master/examples/beam/with_job_server
+# can be created as a sidecar

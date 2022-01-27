@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: beam-job
+spec:
+  template:
+    spec:
+      containers:
+      - image: beam_python_from_jira
+        name: python
+        imagePullPolicy: Never
+        command: ["python", "__main__.py"]
+      restartPolicy: Never
+  backoffLimit: 0

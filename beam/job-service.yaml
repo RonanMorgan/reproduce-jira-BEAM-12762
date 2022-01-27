@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-service
+spec:
+  clusterIP: None
+  ports:
+  - name: job-service
+    port: 8099
+    targetPort: 8099
+  - name: artifact
+    port: 8098
+    targetPort: 8098
+  selector:
+    app: job-service
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: job-service
+spec:
+  selector:
+    matchLabels:
+      app: job-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: job-service
+    spec:
+      hostname: job-service
+      containers:
+      - image: apache/beam_spark3_job_server:2.33.0
+        name: job-service
+        args:
+          - "--spark-master-url=spark://test-spark-master-svc:7077"
+          - "--clean-artifacts-per-job=true"
